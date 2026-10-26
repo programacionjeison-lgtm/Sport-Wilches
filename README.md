@@ -71,3 +71,5 @@ src/
 ## 👤 Autor
 
 **Proyecto de grado** — *Sport-Wilches*
+**Jeison Rodriguez**
+**Aprendiz SENA** - *ADSO*
