@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { formatCOP } from '../utils/format'
 
 export default function ProductCard({ product }) {
   return (
@@ -13,11 +14,7 @@ export default function ProductCard({ product }) {
       />
       <h2 className="font-semibold text-sm line-clamp-2">{product.title}</h2>
      <p className="text-blue-600 font-bold mt-auto pt-2">
-  {new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  }).format(product.price)}
+  {formatCOP(product.price)}
 </p>
     </Link>
   )

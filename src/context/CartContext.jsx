@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-
-const CartContext = createContext()
+import { useEffect, useState } from 'react'
+import { CartContext } from '../hooks/useCart'
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
@@ -53,8 +52,4 @@ export function CartProvider({ children }) {
       {children}
     </CartContext.Provider>
   )
-}
-
-export function useCart() {
-  return useContext(CartContext)
 }

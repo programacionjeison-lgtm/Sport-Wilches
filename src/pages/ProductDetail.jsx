@@ -1,32 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getProduct } from '../services/api'
-import { useCart } from '../context/CartContext'
+import { useCart } from '../hooks/useCart'
+import { formatCOP } from '../utils/format'
 
 export default function ProductDetail() {
   const { id } = useParams()
   const { addToCart } = useCart()
   const [product, setProduct] = useState(null)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    setLoading(true)
     getProduct(id)
       .then(setProduct)
       .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
   }, [id])
+
+  // El "loading" ya no se guarda: se calcula a partir de lo que ya sabemos
+  const loading = !product && !error
 
   if (loading) return <p className="p-4">Cargando producto...</p>
   if (error) return <p className="p-4 text-red-600">{error}</p>
   if (!product) return null
 
-  const priceFormatted = new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  }).format(product.price)
+  const priceFormatted = formatCOP(product.price)
 
   return (
     <div>

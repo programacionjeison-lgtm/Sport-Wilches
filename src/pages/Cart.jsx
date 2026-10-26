@@ -1,12 +1,6 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
-
-const formatCOP = (value) =>
-  new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  }).format(value)
+import { useCart } from '../hooks/useCart'
+import { formatCOP } from '../utils/format'
 
 export default function Cart() {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart()

@@ -1,17 +1,10 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
-
-const formatCOP = (value) =>
-  new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  }).format(value)
+import { Link } from 'react-router-dom'
+import { useCart } from '../hooks/useCart'
+import { formatCOP } from '../utils/format'
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart()
-  const navigate = useNavigate()
 
   const [form, setForm] = useState({
     nombre: '',
