@@ -3,7 +3,7 @@ import { useCart } from '../hooks/useCart'
 import { formatCOP } from '../utils/format'
 
 export default function Cart() {
-  const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart()
+  const { items, removeFromCart, updateQuantity, totalPrice, clearCart, getStock, getRemainingStock } = useCart()
 
   if (items.length === 0) {
     return (
@@ -48,11 +48,23 @@ export default function Cart() {
               <span className="w-8 text-center">{item.quantity}</span>
               <button
                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                className="w-8 h-8 border rounded hover:bg-gray-100"
+                disabled={getRemainingStock(item.id) === 0}
+                className="w-8 h-8 border rounded hover:bg-gray-100 disabled:text-gray-300 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                title={
+                  getRemainingStock(item.id) === 0
+                    ? `Máximo ${getStock(item.id)} unidades`
+                    : undefined
+                }
               >
                 +
               </button>
             </div>
+
+            {getRemainingStock(item.id) === 0 && (
+              <span className="text-xs text-gray-400">
+                Máx. {getStock(item.id)}
+              </span>
+            )}
 
             <p className="w-28 text-right font-semibold">
               {formatCOP(item.price * item.quantity)}

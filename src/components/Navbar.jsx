@@ -31,6 +31,9 @@ export default function Navbar() {
 
           {user ? (
             <div className="flex items-center gap-3">
+              <Link to="/pedidos" className="hover:text-blue-600">
+                Mis pedidos
+              </Link>
               <span className="text-sm text-gray-600">Hola, {user.name.split(' ')[0]}</span>
               <button
                 onClick={handleLogout}

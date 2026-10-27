@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CartContext } from '../hooks/useCart'
+import products from '../data/products'
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
@@ -11,17 +12,35 @@ export function CartProvider({ children }) {
     localStorage.setItem('cart', JSON.stringify(items))
   }, [items])
 
+  // El catálogo es la fuente de verdad del stock disponible de cada producto.
+  function getStock(productId) {
+    const product = products.find((p) => p.id === productId)
+    return product ? product.stock : 0
+  }
+
+  // Unidades que todavía se pueden agregar de un producto al carrito.
+  function getRemainingStock(productId) {
+    const item = items.find((i) => i.id === productId)
+    const remaining = getStock(productId) - (item ? item.quantity : 0)
+    return Math.max(0, remaining)
+  }
+
   function addToCart(product, quantity = 1) {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id)
+      const stock = getStock(product.id)
+      const added = existing ? existing.quantity + quantity : quantity
+      // Nunca superamos el stock disponible del catálogo
+      const finalQuantity = Math.min(added, stock)
       if (existing) {
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: finalQuantity }
             : item
         )
       }
-      return [...prev, { ...product, quantity }]
+      if (finalQuantity < 1) return prev
+      return [...prev, { ...product, quantity: finalQuantity }]
     })
   }
 
@@ -30,7 +49,8 @@ export function CartProvider({ children }) {
   }
 
   function updateQuantity(productId, quantity) {
-    if (quantity < 1) return
+    const stock = getStock(productId)
+    if (quantity < 1 || quantity > stock) return
     setItems((prev) =>
       prev.map((item) =>
         item.id === productId ? { ...item, quantity } : item
@@ -47,7 +67,7 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}
+      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice, getStock, getRemainingStock }}
     >
       {children}
     </CartContext.Provider>

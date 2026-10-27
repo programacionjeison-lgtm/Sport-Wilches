@@ -14,6 +14,7 @@ de compras y completar un pedido con datos de envío, previamente iniciando sesi
 - 👤 **Registro e inicio de sesión** de usuarios
 - 🔒 **Ruta protegida**: el checkout requiere sesión iniciada
 - 🧾 **Checkout** con datos de envío y número de pedido de confirmación
+- 📜 **Historial de pedidos**: cada usuario ve sus compras anteriores en "Mis pedidos"
 - 🧭 Página **404** para rutas inexistentes
 
 ## 🛠️ Tecnologías utilizadas
@@ -62,8 +63,8 @@ src/
 
 ## 🧭 Próximos pasos
 
-- [ ] Respetar el inventario (stock) al agregar productos al carrito
-- [ ] Guardar los pedidos realizados e historial para el usuario
+- [x] Respetar el inventario (stock) al agregar productos al carrito
+- [x] Guardar los pedidos realizados e historial para el usuario
 - [ ] Conectar el frontend con el backend (API real) y base de datos
 - [ ] Autenticación segura con contraseñas encriptadas
 - [ ] Pruebas automatizadas

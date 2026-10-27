@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
+import { useOrders } from '../hooks/useOrders'
 import { formatCOP } from '../utils/format'
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart()
+  const { addOrder } = useOrders()
 
   const [form, setForm] = useState({
     nombre: '',
@@ -21,8 +23,9 @@ export default function Checkout() {
 
   function handleSubmit(e) {
     e.preventDefault()
-    const newOrderNumber = Math.floor(100000 + Math.random() * 900000)
-    setOrderNumber(newOrderNumber)
+    // Guardamos el pedido con historial para el usuario
+    const order = addOrder({ items, shipping: form })
+    setOrderNumber(order.numero)
     setOrderPlaced(true)
     clearCart()
   }
@@ -55,12 +58,20 @@ export default function Checkout() {
         <p className="text-gray-500 mb-6">
           Te contactaremos pronto al teléfono registrado para coordinar la entrega.
         </p>
-        <Link
-          to="/"
-          className="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition"
-        >
-          Volver al catálogo
-        </Link>
+        <div className="flex flex-col gap-2">
+          <Link
+            to="/pedidos"
+            className="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+          >
+            Ver mis pedidos
+          </Link>
+          <Link
+            to="/"
+            className="text-blue-600 hover:underline text-sm"
+          >
+            Volver al catálogo
+          </Link>
+        </div>
       </div>
     )
   }

@@ -6,7 +6,7 @@ import { formatCOP } from '../utils/format'
 
 export default function ProductDetail() {
   const { id } = useParams()
-  const { addToCart } = useCart()
+  const { addToCart, getStock, getRemainingStock } = useCart()
   const [product, setProduct] = useState(null)
   const [error, setError] = useState(null)
 
@@ -24,6 +24,8 @@ export default function ProductDetail() {
   if (!product) return null
 
   const priceFormatted = formatCOP(product.price)
+  const remainingStock = getRemainingStock(product.id)
+  const maxedOut = remainingStock === 0
 
   return (
     <div>
@@ -44,13 +46,18 @@ export default function ProductDetail() {
           <p className="text-gray-600 mt-3">{product.description}</p>
 
           <p className="text-3xl font-bold text-blue-600 mt-6">{priceFormatted}</p>
-          <p className="text-sm text-gray-500 mt-1">Stock disponible: {product.stock}</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {maxedOut
+              ? 'Ya tienes todo el stock disponible en tu carrito 🛒'
+              : `Stock disponible: ${remainingStock} de ${getStock(product.id)}`}
+          </p>
 
          <button
   onClick={() => addToCart(product)}
-  className="mt-6 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
+  disabled={maxedOut}
+  className="mt-6 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
 >
-  Agregar al carrito
+  {maxedOut ? 'Sin más unidades disponibles' : 'Agregar al carrito'}
 </button>
         </div>
       </div>
