@@ -25,6 +25,9 @@ de compras y completar un pedido con datos de envío, previamente iniciando sesi
 | [Vite](https://vite.dev) | Herramienta de desarrollo y compilación |
 | [React Router 7](https://reactrouter.com) | Navegación entre páginas |
 | [Tailwind CSS 4](https://tailwindcss.com) | Estilos de la interfaz |
+| [Express 5](https://expressjs.com) | Backend: API REST de productos y usuarios |
+| [MongoDB + Mongoose](https://mongoosejs.com) | Base de datos de productos y usuarios |
+| [JWT](https://jwt.io) | Autenticación con tokens (en el backend) |
 | Context API + localStorage | Sesión del usuario y carrito persistentes |
 
 ## 🚀 Cómo ejecutar el proyecto
@@ -32,14 +35,37 @@ de compras y completar un pedido con datos de envío, previamente iniciando sesi
 Requiere tener instalado [Node.js](https://nodejs.org) (versión 18 o superior).
 
 ```bash
-# 1. Instalar las dependencias
+# 1. Instalar las dependencias del frontend
 npm install
 
-# 2. Iniciar el servidor de desarrollo
+# 2. Iniciar el servidor de desarrollo del frontend
 npm run dev
 ```
 
 Luego abre en el navegador: http://localhost:5173
+
+### Backend (API real)
+
+El backend vive en la carpeta `backend/` y usa Node.js, Express y MongoDB Atlas.
+
+```bash
+# 1. Instalar las dependencias del backend
+cd backend
+npm install
+
+# 2. Configurar las variables de entorno
+#    (copia backend/.env.example como backend/.env y pon tu MONGO_URI)
+
+# 3. Cargar los productos de ejemplo en la base de datos
+npm run seed
+
+# 4. Iniciar el backend en otra terminal
+npm run dev
+```
+
+El backend corre en http://localhost:4000 y el frontend lo consume
+automáticamente gracias a la variable `VITE_API_URL` del archivo `.env`
+(copia `.env.example` como `.env` en la raíz del proyecto).
 
 ### Otros comandos útiles
 
@@ -52,20 +78,27 @@ npm run lint     # Revisa errores de estilo y código con ESLint
 ## 📁 Estructura del proyecto
 
 ```
-src/
-├── components/       # Componentes reutilizables (Navbar, ProductCard, ProtectedRoute)
-├── context/          # Contextos globales (sesión de usuario, carrito)
-├── data/             # Datos de los productos (mientras no haya backend conectado)
-├── pages/            # Una carpeta por pantalla: Home, Cart, Checkout, Login...
-├── services/         # Comunicación con los datos (simula una API)
-└── utils/            # Funciones de utilidad compartidas (formato de precios)
+mi-tienda/
+├── backend/             # API REST (Express + MongoDB)
+│   ├── models/          # Esquemas de la base de datos (Product, User)
+│   ├── routes/          # Endpoints de la API (products, users)
+│   ├── scripts/         # Carga de datos de ejemplo (seed)
+│   └── server.js        # Punto de entrada del servidor
+├── public/              # Imágenes y archivos estáticos
+└── src/                 # Frontend (React)
+    ├── components/      # Componentes reutilizables (Navbar, ProductCard, ProtectedRoute)
+    ├── context/         # Contextos globales (sesión de usuario, carrito)
+    ├── data/            # Datos de ejemplo locales (ya no se usa, se conserva de referencia)
+    ├── pages/           # Una carpeta por pantalla: Home, Cart, Checkout, Login...
+    ├── services/        # Comunicación con la API del backend
+    └── utils/           # Funciones de utilidad compartidas (formato de precios)
 ```
 
 ## 🧭 Próximos pasos
 
 - [x] Respetar el inventario (stock) al agregar productos al carrito
 - [x] Guardar los pedidos realizados e historial para el usuario
-- [ ] Conectar el frontend con el backend (API real) y base de datos
+- [x] Conectar el frontend con el backend (API real) y base de datos
 - [ ] Autenticación segura con contraseñas encriptadas
 - [ ] Pruebas automatizadas
 

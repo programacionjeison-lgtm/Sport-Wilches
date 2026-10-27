@@ -1,20 +1,28 @@
 import { useEffect, useState } from 'react'
 import { CartContext } from '../hooks/useCart'
-import products from '../data/products'
+import { getProducts } from '../services/api'
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
-    const saved = localStorage.getItem('cart')
+    const saved = localStorage.getItem('cart_v2')
     return saved ? JSON.parse(saved) : []
   })
 
+  // El catálogo es la fuente de verdad del stock disponible de cada producto.
+  const [catalog, setCatalog] = useState([])
+
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(items))
+    getProducts()
+      .then(setCatalog)
+      .catch((err) => console.error('No se pudo cargar el catálogo:', err.message))
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('cart_v2', JSON.stringify(items))
   }, [items])
 
-  // El catálogo es la fuente de verdad del stock disponible de cada producto.
   function getStock(productId) {
-    const product = products.find((p) => p.id === productId)
+    const product = catalog.find((p) => p.id === productId)
     return product ? product.stock : 0
   }
 
