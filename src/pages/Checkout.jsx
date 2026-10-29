@@ -5,7 +5,7 @@ import { useOrders } from '../hooks/useOrders'
 import { formatCOP } from '../utils/format'
 
 export default function Checkout() {
-  const { items, totalPrice, clearCart } = useCart()
+  const { items, totalPrice, clearCart, refreshCatalog } = useCart()
   const { addOrder } = useOrders()
 
   const [form, setForm] = useState({
@@ -34,6 +34,8 @@ export default function Checkout() {
       setOrderNumber(order.numero)
       setOrderPlaced(true)
       clearCart()
+      // El stock cambió en MongoDB: actualizamos la fotografía del catálogo
+      refreshCatalog()
     } catch (err) {
       setError(err.message)
     } finally {
