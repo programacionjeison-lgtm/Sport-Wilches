@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import productRoutes from './routes/products.js'
 import userRoutes from './routes/users.js'
+import orderRoutes from './routes/orders.js'
 
 dotenv.config()
 
@@ -15,6 +16,7 @@ app.use(express.json())
 
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/orders', orderRoutes)
 
 app.get('/', (req, res) => {
   res.json({ mensaje: 'API de Sport-Wilches funcionando 🏀' })
@@ -26,7 +28,7 @@ app.use((req, res) => {
 })
 
 // Manejador global de errores (incluye JSON mal formado)
-app.use((error, req, res, next) => {
+app.use((error, req, res, _next) => {
   if (error.type === 'entity.parse.failed') {
     return res.status(400).json({ error: 'JSON inválido en el cuerpo de la petición' })
   }

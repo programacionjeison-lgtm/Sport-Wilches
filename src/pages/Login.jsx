@@ -13,19 +13,25 @@ export default function Login() {
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e) {
+  // Ahora el login pide al backend que verifique y entregue un token JWT.
+  // El formulario se convierte en "async" porque esperar la respuesta tarda un instante.
+  async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
+    setLoading(true)
     try {
-      login(form)
+      await login(form)
       navigate(redirectTo)
     } catch (err) {
       setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -66,9 +72,10 @@ export default function Login() {
 
         <button
           type="submit"
-          className="mt-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
+          disabled={loading}
+          className="mt-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Iniciar sesión
+          {loading ? 'Verificando...' : 'Iniciar sesión'}
         </button>
       </form>
 

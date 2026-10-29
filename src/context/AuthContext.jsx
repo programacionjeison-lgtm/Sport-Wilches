@@ -1,53 +1,48 @@
 import { useState } from 'react'
 import { AuthContext } from '../hooks/useAuth'
+import { registerUser, loginUser } from '../services/api'
+
+// La sesión se recuerda en el navegador: { token, user }
+// El token es el "boleto" que presentamos al backend en cada petición,
+// y la contraseña nunca se guarda aquí (solo en la base de datos, ya encriptada).
+function loadSession() {
+  const saved = localStorage.getItem('auth')
+  return saved ? JSON.parse(saved) : null
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('currentUser')
-    return saved ? JSON.parse(saved) : null
-  })
+  const [session, setSession] = useState(loadSession)
 
-  function getUsers() {
-    const saved = localStorage.getItem('users')
-    return saved ? JSON.parse(saved) : []
-  }
-
-  function saveUsers(users) {
-    localStorage.setItem('users', JSON.stringify(users))
-  }
-
-  function register({ name, email, password }) {
-    const users = getUsers()
-    const exists = users.some((u) => u.email === email)
-    if (exists) {
-      throw new Error('Ya existe una cuenta con ese correo.')
+  function saveSession(newSession) {
+    setSession(newSession)
+    if (newSession) {
+      localStorage.setItem('auth', JSON.stringify(newSession))
+    } else {
+      localStorage.removeItem('auth')
     }
-    const newUser = { name, email, password }
-    saveUsers([...users, newUser])
-
-    const publicUser = { name, email }
-    setUser(publicUser)
-    localStorage.setItem('currentUser', JSON.stringify(publicUser))
   }
 
-  function login({ email, password }) {
-    const users = getUsers()
-    const found = users.find((u) => u.email === email && u.password === password)
-    if (!found) {
-      throw new Error('Correo o contraseña incorrectos.')
-    }
-    const publicUser = { name: found.name, email: found.email }
-    setUser(publicUser)
-    localStorage.setItem('currentUser', JSON.stringify(publicUser))
+  // Ambas funciones ahora son asíncronas: aquí el backend valida
+  // y responde con { token, user } que guardamos como sesión.
+  async function register(formData) {
+    const { token, user } = await registerUser(formData)
+    saveSession({ token, user })
+  }
+
+  async function login(formData) {
+    const { token, user } = await loginUser(formData)
+    saveSession({ token, user })
   }
 
   function logout() {
-    setUser(null)
-    localStorage.removeItem('currentUser')
+    saveSession(null)
   }
 
+  const user = session?.user || null
+  const token = session?.token || null
+
   return (
-    <AuthContext.Provider value={{ user, register, login, logout }}>
+    <AuthContext.Provider value={{ user, token, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

@@ -16,18 +16,29 @@ export default function Checkout() {
   })
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [orderNumber, setOrderNumber] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e) {
+  // El pedido se envía al backend: allí se verifican stock y precios
+  // reales de MongoDB, se guarda y se descuenta el inventario.
+  async function handleSubmit(e) {
     e.preventDefault()
-    // Guardamos el pedido con historial para el usuario
-    const order = addOrder({ items, shipping: form })
-    setOrderNumber(order.numero)
-    setOrderPlaced(true)
-    clearCart()
+    setError(null)
+    setSubmitting(true)
+    try {
+      const order = await addOrder({ items, shipping: form })
+      setOrderNumber(order.numero)
+      setOrderPlaced(true)
+      clearCart()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // Si el carrito está vacío y no se acaba de confirmar un pedido, no debería estar aquí
@@ -130,11 +141,18 @@ export default function Checkout() {
             />
           </div>
 
+          {error && (
+            <p className="bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2 mb-2">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="mt-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
+            disabled={submitting}
+            className="mt-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Confirmar pedido
+            {submitting ? 'Confirmando pedido...' : 'Confirmar pedido'}
           </button>
         </form>
       </div>

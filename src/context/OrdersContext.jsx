@@ -1,48 +1,50 @@
 import { useEffect, useState } from 'react'
 import { OrdersContext } from '../hooks/useOrders'
 import { useAuth } from '../hooks/useAuth'
+import { createOrder, getOrders } from '../services/api'
 
 export function OrdersProvider({ children }) {
-  const { user } = useAuth()
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('orders')
-    return saved ? JSON.parse(saved) : []
-  })
+  const { user, token } = useAuth()
+  const [orders, setOrders] = useState([])
+  const [error, setError] = useState(null)
 
+  // Cuando haya sesión activa, cargamos los pedidos DESDE EL BACKEND
+  // (ya no del localStorage). El backend solo devuelve los del usuario.
   useEffect(() => {
-    localStorage.setItem('orders', JSON.stringify(orders))
-  }, [orders])
+    if (!user || !token) return
 
-  // Guarda un pedido asociado al usuario con sesión activa
-  // y lo devuelve completo (con número y fecha ya asignados).
-  function addOrder({ items, shipping }) {
-    const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    const order = {
-      numero: Math.floor(100000 + Math.random() * 900000),
-      userEmail: user?.email || null,
-      items: items.map((item) => ({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        quantity: item.quantity,
-        thumbnail: item.thumbnail,
-      })),
-      shipping,
-      total,
-      fecha: new Date().toISOString(),
-      estado: 'En proceso',
+    let activo = true // evita actualizar si el componente ya se desmontó
+
+    getOrders(token)
+      .then((data) => {
+        if (activo) setOrders(data)
+      })
+      .catch((err) => {
+        if (activo) setError(err.message)
+      })
+
+    // Limpieza: si el usuario cambió (login/logout) o se desmontó,
+    // descartamos la respuesta que llegue tarde
+    return () => {
+      activo = false
     }
+  }, [user, token])
+
+  // El estado "guarda" lo que el backend entregó; lo que se muestra
+  // se calcula: sin usuario, no hay pedidos visibles (aunque queden
+  // residuales en memoria hasta que la nueva carga los reemplace).
+  const userOrders = user ? orders : []
+
+  // Guarda el pedido en el backend y lo agrega también en memoria
+  // para que la pantalla lo muestre sin necesidad de recargar.
+  async function addOrder({ items, shipping }) {
+    const order = await createOrder(token, { items, shipping })
     setOrders((prev) => [order, ...prev])
     return order
   }
 
-  // Los pedidos del usuario que tiene sesión iniciada.
-  const userOrders = user
-    ? orders.filter((order) => order.userEmail === user.email)
-    : []
-
   return (
-    <OrdersContext.Provider value={{ userOrders, addOrder }}>
+    <OrdersContext.Provider value={{ userOrders, addOrder, error: user ? error : null }}>
       {children}
     </OrdersContext.Provider>
   )

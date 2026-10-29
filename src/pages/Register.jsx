@@ -13,14 +13,17 @@ export default function Register() {
     confirmPassword: '',
   })
   const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e) {
+  // Ahora el registro lo crea el backend (con contraseña encriptada allí)
+  async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
+    setLoading(true)
 
     if (form.password !== form.confirmPassword) {
       setError('Las contraseñas no coinciden.')
@@ -32,10 +35,12 @@ export default function Register() {
     }
 
     try {
-      register(form)
+      await register({ name: form.name, email: form.email, password: form.password })
       navigate('/')
     } catch (err) {
       setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -100,9 +105,10 @@ export default function Register() {
 
         <button
           type="submit"
-          className="mt-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition"
+          disabled={loading}
+          className="mt-2 bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
-          Crear cuenta
+          {loading ? 'Creando cuenta...' : 'Crear cuenta'}
         </button>
       </form>
 

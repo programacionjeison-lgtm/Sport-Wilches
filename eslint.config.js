@@ -18,4 +18,19 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  // El backend corre en Node, no en el navegador: allí existen `process`
+  // y otras variables globales de Node que el lint del browser no conoce.
+  {
+    files: ['backend/**/*.js'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      // Parámetros que empiezan con "_" son "reservados por convención"
+      // (Express exige la firma completa en los manejadores de errores,
+      // aunque dentro no se use el parámetro)
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
 ])

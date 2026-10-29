@@ -26,3 +26,57 @@ export async function getProduct(id) {
   const product = await request(`/api/products/${id}`)
   return normalizeProduct(product)
 }
+
+// ---- Pedidos ----
+
+// El token JWT viaja en el encabezado "Authorization: Bearer <token>"
+function authHeaders(token) {
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+async function requestApi(path, options = {}) {
+  const response = await fetch(`${BASE_URL}${path}`, options)
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    throw new Error(data.error || `Error del servidor (${response.status})`)
+  }
+
+  return data
+}
+
+// POST /api/orders → guardar el pedido del usuario con sesión activa
+export function createOrder(token, { items, shipping }) {
+  return requestApi('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ items, shipping }),
+  })
+}
+
+// GET /api/orders → pedidos del usuario autenticado
+export function getOrders(token) {
+  return requestApi('/api/orders', {
+    headers: authHeaders(token),
+  })
+}
+
+// ---- Usuarios ----
+
+// POST /api/users/register → crear cuenta (devuelve token + usuario)
+export function registerUser(userData) {
+  return requestApi('/api/users/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  })
+}
+
+// POST /api/users/login → iniciar sesión (devuelve token + usuario)
+export function loginUser(credentials) {
+  return requestApi('/api/users/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  })
+}

@@ -11,7 +11,8 @@ de compras y completar un pedido con datos de envío, previamente iniciando sesi
 - 🗂️ **Filtro** por categoría
 - 🛒 **Carrito de compras** con cantidades, subtotales y total en pesos colombianos (COP)
 - 💾 El carrito **persiste** aunque se recargue la página (localStorage)
-- 👤 **Registro e inicio de sesión** de usuarios
+- 👤 **Registro e inicio de sesión** con contraseñas encriptadas y token JWT (backend)
+- 📜 **Historial de pedidos** guardado en la base de datos, leído desde la API
 - 🔒 **Ruta protegida**: el checkout requiere sesión iniciada
 - 🧾 **Checkout** con datos de envío y número de pedido de confirmación
 - 📜 **Historial de pedidos**: cada usuario ve sus compras anteriores en "Mis pedidos"
@@ -97,9 +98,9 @@ mi-tienda/
 ## 🧭 Próximos pasos
 
 - [x] Respetar el inventario (stock) al agregar productos al carrito
-- [x] Guardar los pedidos realizados e historial para el usuario
+- [x] Guardar los pedidos realizados en la base de datos e historial para el usuario
 - [x] Conectar el frontend con el backend (API real) y base de datos
-- [ ] Autenticación segura con contraseñas encriptadas
+- [x] Autenticación segura con contraseñas encriptadas (bcrypt + JWT)
 - [ ] Pruebas automatizadas
 
 ## 👤 Autor

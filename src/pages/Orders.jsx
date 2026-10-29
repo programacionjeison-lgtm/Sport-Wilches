@@ -3,7 +3,22 @@ import { useOrders } from '../hooks/useOrders'
 import { formatCOP } from '../utils/format'
 
 export default function Orders() {
-  const { userOrders } = useOrders()
+  const { userOrders, error } = useOrders()
+
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <h1 className="text-2xl font-bold mb-2">No pudimos cargar tus pedidos</h1>
+        <p className="text-red-600 mb-6">{error}</p>
+        <Link
+          to="/"
+          className="inline-block bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          Volver al inicio
+        </Link>
+      </div>
+    )
+  }
 
   if (userOrders.length === 0) {
     return (
