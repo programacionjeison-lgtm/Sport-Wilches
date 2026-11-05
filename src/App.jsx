@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
 import Orders from './pages/Orders'
+import PaymentResult from './pages/PaymentResult'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -32,6 +33,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Orders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pago/resultado"
+            element={
+              <ProtectedRoute>
+                <PaymentResult />
               </ProtectedRoute>
             }
           />

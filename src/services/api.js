@@ -80,3 +80,21 @@ export function loginUser(credentials) {
     body: JSON.stringify(credentials),
   })
 }
+
+// ---- Pasarela de pagos (Wompi) ----
+
+// POST /api/payments/link → pedir el enlace de pago de un pedido
+export function createPaymentLink(token, numero) {
+  return requestApi('/api/payments/link', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+    body: JSON.stringify({ numero }),
+  })
+}
+
+// GET /api/payments/verify/:numero → preguntar a Wompi si el pedido ya pagó
+export function verifyPayment(token, numero) {
+  return requestApi(`/api/payments/verify/${numero}`, {
+    headers: authHeaders(token),
+  })
+}

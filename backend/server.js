@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 import productRoutes from './routes/products.js'
 import userRoutes from './routes/users.js'
 import orderRoutes from './routes/orders.js'
+import paymentRoutes from './routes/payments.js'
 
 dotenv.config()
 
@@ -17,6 +18,7 @@ app.use(express.json())
 app.use('/api/products', productRoutes)
 app.use('/api/users', userRoutes)
 app.use('/api/orders', orderRoutes)
+app.use('/api/payments', paymentRoutes)
 
 app.get('/', (req, res) => {
   res.json({ mensaje: 'API de Sport-Wilches funcionando 🏀' })

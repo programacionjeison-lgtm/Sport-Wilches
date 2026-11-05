@@ -1,9 +1,41 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useOrders } from '../hooks/useOrders'
+import { useAuth } from '../hooks/useAuth'
+import { verifyPayment } from '../services/api'
 import { formatCOP } from '../utils/format'
 
+// Cada estado del pedido tiene su "color semántico":
+const COLORES_ESTADO = {
+  'Pendiente de pago': 'bg-amber-100 text-amber-700',
+  'Pagado': 'bg-green-100 text-green-700',
+  'En proceso': 'bg-blue-100 text-blue-700',
+  'Enviado': 'bg-indigo-100 text-indigo-700',
+  'Entregado': 'bg-emerald-100 text-emerald-700',
+  'Cancelado': 'bg-red-100 text-red-700',
+}
+
 export default function Orders() {
-  const { userOrders, error } = useOrders()
+  const { userOrders, error, reload } = useOrders()
+  const { token } = useAuth()
+  const [verificando, setVerificando] = useState(null) // número que se está verificando
+  const [aviso, setAviso] = useState(null)
+
+  // Pregunta al backend (que a su vez pregunta a Wompi) si el pedido ya
+  // tiene una transacción aprobada; si sí, el pedido pasa a "Pagado".
+  async function confirmarPago(numero) {
+    setVerificando(numero)
+    setAviso(null)
+    try {
+      const result = await verifyPayment(token, numero)
+      setAviso(`Pedido #${numero}: ${result.message}`)
+      reload() // la lista se re-descarga con el estado actualizado
+    } catch (err) {
+      setAviso(`Pedido #${numero}: ${err.message}`)
+    } finally {
+      setVerificando(null)
+    }
+  }
 
   if (error) {
     return (
@@ -41,6 +73,12 @@ export default function Orders() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Mis pedidos</h1>
 
+      {aviso && (
+        <p className="bg-blue-50 text-blue-800 text-sm rounded-lg px-3 py-2 mb-4">
+          {aviso}
+        </p>
+      )}
+
       <div className="flex flex-col gap-4">
         {userOrders.map((order) => {
           const date = new Date(order.fecha).toLocaleDateString('es-CO', {
@@ -62,9 +100,22 @@ export default function Orders() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Estado</p>
-                  <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                  <span
+                    className={`text-xs font-semibold px-2 py-1 rounded-full ${COLORES_ESTADO[order.estado] || 'bg-gray-100 text-gray-700'}`}
+                  >
                     {order.estado}
                   </span>
+                  {order.estado === 'Pendiente de pago' && (
+                    <button
+                      onClick={() => confirmarPago(order.numero)}
+                      disabled={verificando === order.numero}
+                      className="block mt-2 text-xs text-blue-600 hover:underline disabled:text-gray-400"
+                    >
+                      {verificando === order.numero
+                        ? 'Confirmando con la pasarela...'
+                        : '💳 Ya pagué — confirmar pago'}
+                    </button>
+                  )}
                 </div>
               </div>
 

@@ -37,11 +37,20 @@ const orderSchema = new mongoose.Schema(
     items: { type: [itemSchema], validate: (v) => v.length > 0 },
     shipping: { type: shippingSchema, required: true },
     total: { type: Number, required: true, min: 0 },
+    // Ciclo de vida del pedido:
+    //   Pendiente de pago → el pedido existe pero Wompi aún no confirma el pago
+    //   Pagado → la pasarela confirma el pago (y entonces se descuenta el stock)
+    //   En proceso → ya preparándose para el envío
+    //   Enviado / Entregado / Cancelado
     estado: {
       type: String,
-      enum: ['En proceso', 'Enviado', 'Entregado', 'Cancelado'],
-      default: 'En proceso',
+      enum: ['Pendiente de pago', 'Pagado', 'En proceso', 'Enviado', 'Entregado', 'Cancelado'],
+      default: 'Pendiente de pago',
     },
+    // ID de la transacción que Wompi nos informo cuando el pago se confirmó
+    transactionId: { type: String },
+    // ID del enlace de pago de Wompi (para poder preguntarle la transacción)
+    paymentLinkId: { type: String },
   },
   { timestamps: true } // crea createdAt (fecha del pedido) automáticamente
 )

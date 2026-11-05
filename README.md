@@ -13,6 +13,7 @@ de compras y completar un pedido con datos de envío, previamente iniciando sesi
 - 💾 El carrito **persiste** aunque se recargue la página (localStorage)
 - 👤 **Registro e inicio de sesión** con contraseñas encriptadas y token JWT (backend)
 - 📧 **Correo de confirmación** de registro enviada automáticamente al email del usuario
+- 💳 **Pasarela de pagos con Wompi** (tarjeta, PSE, Nequi...) en modo de pruebas: pedido "Pendiente de pago" → enlace de pago → confirmación del pago con la API de Wompi → el pedido pasa a "Pagado" y se descuenta el inventario
 - 📜 **Historial de pedidos** guardado en la base de datos, leído desde la API
 - 🔒 **Ruta protegida**: el checkout requiere sesión iniciada
 - 🧾 **Checkout** con datos de envío y número de pedido de confirmación

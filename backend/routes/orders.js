@@ -90,16 +90,12 @@ router.post('/', async (req, res) => {
       items: lineas,
       shipping,
       total,
+      // El estado por defecto es "Pendiente de pago": todavía no hay
+      // confirmación de la pasarela. El stock se descuenta SOLO al pagar
+      // (ver routes/payments.js), como ocurre en una tienda real.
     })
 
     const saved = await order.save()
-
-    // Descontamos el stock de cada producto comprado
-    for (const linea of lineas) {
-      await Product.findByIdAndUpdate(linea.product, {
-        $inc: { stock: -linea.quantity },
-      })
-    }
 
     // Respuesta en el "formato del frontend" (id en vez de _id)
     res.status(201).json({
@@ -139,6 +135,7 @@ router.get('/', async (req, res) => {
         shipping: order.shipping,
         total: order.total,
         estado: order.estado,
+        transactionId: order.transactionId,
         fecha: order.createdAt,
       }))
     )

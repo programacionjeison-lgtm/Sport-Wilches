@@ -43,8 +43,16 @@ export function OrdersProvider({ children }) {
     return order
   }
 
+  // Re-descarga los pedidos desde el backend (p. ej. tras confirmar un pago)
+  function reload() {
+    if (!user || !token) return
+    getOrders(token)
+      .then((data) => setOrders(data))
+      .catch((err) => setError(err.message))
+  }
+
   return (
-    <OrdersContext.Provider value={{ userOrders, addOrder, error: user ? error : null }}>
+    <OrdersContext.Provider value={{ userOrders, addOrder, error: user ? error : null, reload }}>
       {children}
     </OrdersContext.Provider>
   )
