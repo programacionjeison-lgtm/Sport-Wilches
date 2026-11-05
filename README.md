@@ -12,6 +12,7 @@ de compras y completar un pedido con datos de envío, previamente iniciando sesi
 - 🛒 **Carrito de compras** con cantidades, subtotales y total en pesos colombianos (COP)
 - 💾 El carrito **persiste** aunque se recargue la página (localStorage)
 - 👤 **Registro e inicio de sesión** con contraseñas encriptadas y token JWT (backend)
+- 📧 **Correo de confirmación** de registro enviada automáticamente al email del usuario
 - 📜 **Historial de pedidos** guardado en la base de datos, leído desde la API
 - 🔒 **Ruta protegida**: el checkout requiere sesión iniciada
 - 🧾 **Checkout** con datos de envío y número de pedido de confirmación

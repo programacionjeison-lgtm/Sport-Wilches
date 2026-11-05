@@ -2,6 +2,7 @@ import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../models/User.js'
+import { sendWelcomeEmail } from '../services/mailer.js'
 
 const router = express.Router()
 
@@ -54,6 +55,12 @@ router.post('/register', async (req, res) => {
       password: hashedPassword,
     })
     await newUser.save()
+
+    // Req. funcional: al registrarse, la persona recibe un correo
+    // confirmando que su cuenta fue creada con éxito.
+    // (Si el correo falla, el registro igual queda guardado —
+    //  sendWelcomeEmail maneja sus propios errores por dentro)
+    await sendWelcomeEmail(newUser.email, newUser.name)
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: '7d',
